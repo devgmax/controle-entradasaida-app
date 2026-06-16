@@ -9,7 +9,7 @@ ARQUIVO_LOG = "registro_ponto.txt"
 class AppPonto:
     def __init__(self, root):
         self.root = root
-        self.root.title("Controle de Entrada e Sáida")
+        self.root.title("Controle de Entrada e Saída")
         self.root.geometry("1050x700")
         
         # Verifica e cria os dados fictícios se for a primeira vez rodando.
@@ -36,7 +36,7 @@ class AppPonto:
         
         
     def preparar_ambiente_ficticio(self):
-        # Cria um banco de dados de teste automaticamente se for a primeira execução
+        # Cria um banco de dados de teste automaticamente se for a primeira  execução
         if not os.path.exists(ARQUIVO_MEMORIA):
             dados_padrao = {
                 "Dev Pleno": {is_in": False, "obs": "", "status": Ativo"},
