@@ -1,10 +1,23 @@
 import tkinter as tk
 import json
 import os
+import calendar
+from datetime import datetime
 
-# Constantes Génericas para o Controle
+# =======================
+# 1. CONSTANTES GLOBAIS.
+# =======================
 ARQUIVO_MEMORIA = "dados_sistema.json"
 ARQUIVO_LOG = "registro_ponto.txt"
+
+def registrar_log(mensagem):
+    """"Salva a ação com data e hora no arquivo de texto local."""
+    agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    try:
+        with open(ARQUIVO_LOG, "a", encoding="utf-8") as f:
+            f.write(f"[{agora}] {mensagem}\n")
+    except Exception as e:
+        print("Erro ao salvar log:", e)        
 
 class AppPonto:
     def __init__(self, root):
@@ -67,8 +80,25 @@ class FuncionarioRow:
         
         # Nome do funcionário alinhado à esquerda.
         self.lbl_nome = tk.Label(self.frame, text=nome, width=20, anchor="w", font=("Arial", 11, "bold"))
-        self.lbl_nome.pack(side="left")                 
-                
+        self.lbl_nome.pack(side="left") 
+        
+        # Botão interativo de Status.
+        self.btn_status = tk.Button(
+            self.frame, text="OUT", bg="red", fg="white",
+            width=8, font=("Arial", 10, "bold"),
+            command=self.toggle_status
+        )
+        self.btn_status.pack(side="left", padx=15)
+    
+    def toggle_status(self):
+        """Inverte o status e atualiza a interface visualmente."""
+        self.is_in = not self.is_in
+        if self.is_in:
+            self.btn_status.config(text="IN", bg="green")
+        else:
+            self.btn_status.config(text="OUT", bg="red")   
+                                
+# Bloco de execução.                
 if __name__ == "__main__":
     root = tk.TK()
     app = AppPonto(root)
