@@ -53,10 +53,29 @@ class AppPonto:
             except Exception as e:
                 print(f"Erro ao criar banco de dados inicial: {e}")
                 
-if __name__m == "__main__":
+                
+# Componentização da linha dos colaboradores
+
+class FuncionarioRow:
+    def __init__(self, parent, nome):
+        self.nome = nome
+        self.is_in = False # O status padrão que iniciar o app é todos em OUT (Falso).
+        
+        # Container Visual que segura os elementos do funcionário específica
+        self.frame = tk.Frame(parent, bd=1, relief="ridge", padx=5, pady=5)
+        self.frame.pack(fill="x", padx=10, pady=2)
+        
+        # Nome do funcionário alinhado à esquerda.
+        self.lbl_nome = tk.Label(self.frame, text=nome, width=20, anchor="w", font=("Arial", 11, "bold"))
+        self.lbl_nome.pack(side="left")                 
+                
+if __name__ == "__main__":
     root = tk.TK()
     app = AppPonto(root)
-    root.mainloop()                            
+    root.mainloop()           
+    
+    
+                     
         
         
         
