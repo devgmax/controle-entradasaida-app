@@ -39,12 +39,12 @@ class AppPonto:
         # Cria um banco de dados de teste automaticamente se for a primeira  execução
         if not os.path.exists(ARQUIVO_MEMORIA):
             dados_padrao = {
-                "Dev Pleno": {is_in": False, "obs": "", "status": Ativo"},
-                "Dev Backend": {is_in": False, "obs": "", "status": Ativo"},
-                "Dev Senior": {is_in": False, "obs": "", "status": Ativo"},
-                "Estagiário": {is_in": False, "obs": "", "status": Ativo"},
-                "Dev Full Stack": {is_in": False, "obs": "", "status": Ativo"},
-                "Gerente de Projetos": {is_in": False, "obs": "", "status": Ativo"},
+                "Dev Pleno": {"is_in": False, "obs": "", "status": "Ativo"},
+                "Dev Backend": {"is_in": False, "obs": "", "status": "Ativo"},
+                "Dev Senior": {"is_in": False, "obs": "", "status": "Ativo"},
+                "Estagiário": {"is_in": False, "obs": "", "status": "Ativo"},
+                "Dev Full Stack": {"is_in": False, "obs": "", "status": "Ativo"},
+                "Gerente de Projetos": {"is_in": False, "obs": "", "status": "Ativo"}
             }
             try:
                 with open (ARQUIVO_MEMORIA, "w", encoding="utf-8") as f:
