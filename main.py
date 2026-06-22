@@ -103,17 +103,42 @@ class FuncionarioRow:
             
         registrar_log(f"Status de {self.nome} alterado para {status.upper()}.")
         self.app.salvar_dados()
-        self.app.atualizar_log_tela()                            
+        self.app.atualizar_log_tela()
+        
+#=============================
+# APLICAÇÃO PRINCIPAL (Layout)                                    
+#=============================
+class AppPonto:
+    def __init__(self, root):
+        #==================================
+        # CONFIGURAÇÃO RAIZ E INICIALIZAÇÃO
+        #==================================
+        self.root = root
+        self.root.title("Controle de Presença Corporativo - Open Source")
+        self.root.geometry("1050x700")
+        
+        self.preparar_ambiente_ficticio()
+        self.funcionarios_rows = []
+        
+        self._configurar_layout()
+        self.carregar_dados()
+        registrar_log("--- SISTEMA INICIADO ---")
+        self.atualizar_log_tela()
+    
+    def preparar_ambiente_ficticio(self):
+        """"Cria o JSON base se o app for aberto pela primeira vez."""
+        if not os.path.exists(ARQUIVO_MEMORIA):
+           equipe = [
+               "Gerente de Projetos", "Tech Lead", "Dev Senior", "Dev Pleno", 
+               "Dev Backend", "Dev Frontend", "Dev Full Stack", "QA Analyst",
+               "UX Designer", "Estagiário 01", "Estagiário 02", "Analista de Suporte"
+           ]
+           dados_padrao = {nome: {"is_in": False, "status": "Ativo"} for nome in equipe}
+           dados_padrao["DATA_SISTEMA"] = datetime.now().strftime("%Y-%m-%d")
            
+        try:
+            with open(ARQUIVO_MEMORIA, "w", encoding="utf-8") as f:
+                   json.dump(dados_padrao, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+                pass
             
-# Bloco de execução.                
-if __name__ == "__main__":
-    root = tk.TK()
-    app = AppPonto(root)
-    root.mainloop()           
-    
-    
-                     
-        
-        
-        
