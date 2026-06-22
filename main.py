@@ -141,4 +141,34 @@ class AppPonto:
                    json.dump(dados_padrao, f, ensure_ascii=False, indent=4)
         except Exception as e:
                 pass
-            
+    
+    def _configurar_layout(self):
+        #================================================
+        # LADO ESQUERDO (Lista com Scrollbar) E TÍTULOS.
+        #================================================ 
+        """MOnta todas as divisões da tela principal."""
+        tk.Label(self.root, text="Controle de Entrada e Saída", font=("Arial", 16, "bold")).pack(pady=10)
+        tk.Label(self.root, text="© 2026 Gabriel Max • Licença MIT (GitHub: devgmax)", font=("Arial", 9, "Italic"), fg="gray").pack(side="bottom", pady=5)
+        
+        # -- Lado Esquerdo: Lista com Scroll
+        container_esquerda = tk.Frame(self.root)
+        container_esquerda.pack(side="left", fill="both", expand=True)
+        
+        self.canvas = tk.Canvas(container_esquerda, borderwidth=0, highlightthickness=0)
+        self.scrollbar = tk.Scrollbar(container_esquerda, orient="vertical", command=self.canvas.yview)
+        self.frame_funcionarios = tk.Frame(self.canvas)
+        
+        self.frame_funcionarios.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.canvas.create_window((0, 0), window=self.frame_funcionarios, anchor="nw")
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.canvas.bind_all("<MouseWheel>", lambda e: self.canvas.yview_scroll(int(-1*(e.delta/120)), "units"))
+
+        self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
+        
+        # Inicializa a lista visual da equipe a partir do arquivo de dados local
+        with open(ARQUIVO_MEMORIA, "r", encoding="utf-8") as f:
+            nomes = [k for k in json.load(f).keys() if k != "DATA_SISTEMA"]
+            for nome in nomes:
+                row = FuncionarioRow(self.frame_funcionarios, nome, self)
+                self.funcionarios_rows.append(row)            
