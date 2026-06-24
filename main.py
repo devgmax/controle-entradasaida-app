@@ -172,8 +172,10 @@ class AppPonto:
             for nome in nomes:
                 row = FuncionarioRow(self.frame_funcionarios, nome, self)
                 self.funcionarios_rows.append(row)
-                
-        # -- Lado direito: Calendário e Logs
+        
+        #==============================
+        # LADO DIREITO E CAIXAS DE LOGS
+        #==============================
         frame_lateral = tk.Frame(self.root, bd=2, relief="groove", padx=10, pady=10)
         frame_lateral.pack(side="right", fill="y", padx=15, pady=5)
          
