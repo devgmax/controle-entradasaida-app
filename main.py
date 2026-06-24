@@ -171,4 +171,32 @@ class AppPonto:
             nomes = [k for k in json.load(f).keys() if k != "DATA_SISTEMA"]
             for nome in nomes:
                 row = FuncionarioRow(self.frame_funcionarios, nome, self)
-                self.funcionarios_rows.append(row)            
+                self.funcionarios_rows.append(row)
+                
+        # -- Lado direito: Calendário e Logs
+        frame_lateral = tk.Frame(self.root, bd=2, relief="groove", padx=10, pady=10)
+        frame_lateral.pack(side="right", fill="y", padx=15, pady=5)
+         
+        tk.Label(frame_lateral, text="Calendário", font=("Arial", 12, "bold")).pack(pady=(0, 5))
+        self.frame_calendario = tk.Frame(frame_lateral)
+        self.frame_calendario.pack(pady=5)
+        
+        agora = datetime.now()
+        self.ano_atual, self.mes_atual = agora.year, agora.month
+        self.desenhar_calendario()
+        
+        tk.Frame(frame_lateral, height=2, bg="gray").pack(fill="x", pady=10)
+        tk.Button(frame_lateral, text="🔍 Busca Avançada", bg="#0052cc", fg="white", font=("Arial", 10, "bold"), command=self.abrir_janela_busca).pack(fill="x", pady=5)
+        tk.Frame(frame_lateral, height=2, bg="gray").pack(fill="x", pady=10)
+        
+        tk.Label(frame_lateral, text="Histórico Recente", font=("Arial", 12, "bold")).pack(pady=(5, 5))
+        frame_log = tk.Frame(frame_lateral)
+        frame_log.pack(fill="both", expand=True)
+        
+        self.caixa_log = tk.Text(frame_log, width=45, height=12, state="disabled", font=("Arial", 9))
+        scroll_log = tk.Scrollbar(frame_log, command=self.caixa_log.yview)
+        self.caixa_log.configure(yscrollcommand=scroll_log.set)
+        self.caixa_log.pack(side="left", fill="both", expand=True)
+        scroll_log.pack(side="right", fill="y")   
+        
+                         
