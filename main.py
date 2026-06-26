@@ -296,8 +296,60 @@ class AppPonto:
                     caixa.insert(tk.END, msg_vazio)
         except:
             caixa.insert(tk.END, "O arquivo de log ainda não existe.")
-        caixa.config(state="disabled")    
-           
+        caixa.config(state="disabled")
+        
+    # -- LÓGICA DE PERSISTÊNCIA E VIRADA DE DIA. --
+    
+    def atualizar_log_tela(self):
+        self.caixa_log.config(state="normal")
+        self.caixa_log.delete(1.0, tk.END) 
+        try:
+            with open(ARQUIVO_LOG, "r", encoding="utf-8") as f:
+                for linha in f.readlines()[-40:]:
+                    self.caixa_log.insert(tk.END, linha)
+            self.caixa_log.yview(tk.END) 
+        except FileNotFoundError:
+            self.caixa_log.insert(tk.END, "Nenhum registro ainda.")
+        self.caixa_log.config(state="disabled") 
+
+    def salvar_dados(self):
+        dados = {"DATA_SISTEMA": datetime.now().strftime("%Y-%m-%d")}
+        for row in self.funcionarios_rows:
+            dados[row.nome] = {"is_in": row.is_in, "status": row.status_var.get()}
+        try:
+            with open(ARQUIVO_MEMORIA, "w", encoding="utf-8") as f:
+                json.dump(dados, f, ensure_ascii=False, indent=4)
+        except Exception as e:
+            print("Erro ao salvar memória:", e)
+
+    def carregar_dados(self):
+        hoje_str = datetime.now().strftime("%Y-%m-%d")
+        teve_virada = False
+        
+        try:
+            with open(ARQUIVO_MEMORIA, "r", encoding="utf-8") as f:
+                dados = json.load(f)
+                
+            if dados.get("DATA_SISTEMA", "") not in ["", hoje_str]:
+                teve_virada = True
+                registrar_log("--- NOVO DIA INICIADO: TODOS OS ATIVOS RESETADOS PARA OUT ---")
+                
+            for row in self.funcionarios_rows:
+                if row.nome in dados:
+                    memoria = dados[row.nome]
+                    row.status_var.set(memoria.get("status", "Ativo"))
+                    
+                    if row.status_var.get() != "Ativo":
+                        row.btn_status.config(text=row.status_var.get().upper(), bg="gray")
+                        row.is_in = False
+                    else:
+                        row.is_in = False if teve_virada else memoria.get("is_in", False)
+                        cor, texto = ("green", "IN") if row.is_in else ("red", "OUT")
+                        row.btn_status.config(text=texto, bg=cor)
+            
+            if teve_virada: self.salvar_dados()
+        except FileNotFoundError:
+            pass                     
         
 # -- BLOCO DE EXECUÇÃO --
 if __name__ == "__main__":
