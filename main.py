@@ -199,6 +199,115 @@ class AppPonto:
         scroll_log = tk.Scrollbar(frame_log, command=self.caixa_log.yview)
         self.caixa_log.configure(yscrollcommand=scroll_log.set)
         self.caixa_log.pack(side="left", fill="both", expand=True)
-        scroll_log.pack(side="right", fill="y")   
+        scroll_log.pack(side="right", fill="y")
+        
+    # = LOGICA DO CALENDÁRIO E BUSCA =
+    
+    # -- MOTORES DO CALENDÁRIO E DE BUSCA AVANÇADA --
+    def desenhar_calendario(self):
+        for widget in self.frame_calendario.winfo_children(): widget.destroy()
+
+        meses_pt = {1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril", 5: "Maio", 6: "Junho", 7: "Julho", 8: "Agosto", 9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"}
+        frame_nav = tk.Frame(self.frame_calendario)
+        frame_nav.grid(row=0, column=0, columnspan=7, pady=5)
+
+        tk.Button(frame_nav, text="<", command=self.mes_anterior, width=2).pack(side="left", padx=5)
+        tk.Label(frame_nav, text=f"{meses_pt[self.mes_atual]} {self.ano_atual}", font=("Arial", 10, "bold"), width=15).pack(side="left")
+        tk.Button(frame_nav, text=">", command=self.mes_proximo, width=2).pack(side="left", padx=5)
+
+        for col, dia in enumerate(["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"]):
+            tk.Label(self.frame_calendario, text=dia, font=("Arial", 9, "bold")).grid(row=1, column=col)
+
+        hoje = datetime.now()
+        for row_idx, semana in enumerate(calendar.monthcalendar(self.ano_atual, self.mes_atual)):
+            for col_idx, dia in enumerate(semana):
+                if dia != 0:
+                    cor_fundo = "lightblue" if (dia == hoje.day and self.mes_atual == hoje.month and self.ano_atual == hoje.year) else "SystemButtonFace"
+                    btn = tk.Button(self.frame_calendario, text=str(dia), width=3, bg=cor_fundo, command=lambda d=dia, m=self.mes_atual, a=self.ano_atual: self.buscar_log_do_dia(d, m, a))
+                    btn.grid(row=row_idx+2, column=col_idx, padx=1, pady=1)
+
+    def mes_anterior(self):
+        self.mes_atual, self.ano_atual = (12, self.ano_atual - 1) if self.mes_atual == 1 else (self.mes_atual - 1, self.ano_atual)
+        self.desenhar_calendario()
+
+    def mes_proximo(self):
+        self.mes_atual, self.ano_atual = (1, self.ano_atual + 1) if self.mes_atual == 12 else (self.mes_atual + 1, self.ano_atual)
+        self.desenhar_calendario()
+
+    def buscar_log_do_dia(self, dia, mes, ano):
+        data_fmt = f"{dia:02d}/{mes:02d}/{ano}"
+        self._exibir_modal_resultados(f"Histórico do dia {data_fmt}", lambda linha: data_fmt in linha, f"Nenhum ponto registrado no dia {data_fmt}.")
+
+    def abrir_janela_busca(self):
+        janela = tk.Toplevel(self.root)
+        janela.title("Buscar Histórico")
+        janela.geometry("500x450")
+        janela.grab_set()
+
+        tk.Label(janela, text="Filtros de Pesquisa\n(Ex: DD/MM/AAAA)", font=("Arial", 12, "bold")).pack(pady=10)
+        frame_filtros = tk.Frame(janela)
+        frame_filtros.pack(pady=5)
+
+        tk.Label(frame_filtros, text="Nome:").grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        ent_nome = tk.Entry(frame_filtros, width=25)
+        ent_nome.grid(row=0, column=1, padx=5, pady=5)
+
+        tk.Label(frame_filtros, text="Data:").grid(row=1, column=0, padx=5, pady=5, sticky="e")
+        ent_data = tk.Entry(frame_filtros, width=25)
+        ent_data.grid(row=1, column=1, padx=5, pady=5)
+
+        frame_res = tk.Frame(janela)
+        caixa_res = tk.Text(frame_res, state="disabled", font=("Arial", 9))
+        scroll_res = tk.Scrollbar(frame_res, command=caixa_res.yview)
+        caixa_res.configure(yscrollcommand=scroll_res.set)
+
+        def executar_busca():
+            termo_n, termo_d = ent_nome.get().lower().strip(), ent_data.get().strip()
+            caixa_res.config(state="normal")
+            caixa_res.delete(1.0, tk.END)
+            try:
+                with open(ARQUIVO_LOG, "r", encoding="utf-8") as f:
+                    linhas = [l for l in f.readlines() if termo_n in l.lower() and termo_d in l]
+                    if linhas:
+                        for l in linhas: caixa_res.insert(tk.END, l)
+                    else:
+                        caixa_res.insert(tk.END, "Nenhum registro encontrado.")
+            except:
+                caixa_res.insert(tk.END, "Arquivo de log inexistente.")
+            caixa_res.config(state="disabled")
+
+        tk.Button(janela, text="🔍 Buscar", bg="green", fg="white", font=("Arial", 10, "bold"), command=executar_busca).pack(pady=10)
+        frame_res.pack(fill="both", expand=True, padx=15, pady=10)
+        caixa_res.pack(side="left", fill="both", expand=True)
+        scroll_res.pack(side="right", fill="y")
+
+    def _exibir_modal_resultados(self, titulo, condicao_filtro, msg_vazio):
+        """Método auxiliar para renderizar a janela de resultados de logs."""
+        janela = tk.Toplevel(self.root)
+        janela.title(titulo)
+        janela.geometry("550x400")
+        janela.grab_set()
+
+        tk.Label(janela, text=titulo, font=("Arial", 12, "bold")).pack(pady=10)
+        frame = tk.Frame(janela)
+        frame.pack(fill="both", expand=True, padx=15, pady=10)
+        
+        caixa = tk.Text(frame, state="normal", font=("Arial", 9))
+        scroll = tk.Scrollbar(frame, command=caixa.yview)
+        caixa.configure(yscrollcommand=scroll.set)
+        caixa.pack(side="left", fill="both", expand=True)
+        scroll.pack(side="right", fill="y")
+
+        try:
+            with open(ARQUIVO_LOG, "r", encoding="utf-8") as f:
+                linhas = [l for l in f.readlines() if condicao_filtro(l)]
+                if linhas:
+                    for l in linhas: caixa.insert(tk.END, l)
+                else:
+                    caixa.insert(tk.END, msg_vazio)
+        except:
+            caixa.insert(tk.END, "O arquivo de log ainda não existe.")
+        caixa.config(state="disabled")    
+           
         
                          
