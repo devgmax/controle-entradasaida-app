@@ -6,9 +6,7 @@ from datetime import datetime
 import os
 from PIL import Image, ImageTk
 
-# ======================================
-# 1. CONSTANTES GLOBAIS E FUNÇÃO DE LOG.
-# ======================================
+# -- CONSTANTES GLOBAIS E FUNÇÃO DE LOG. --
 ARQUIVO_MEMORIA = "dados_sistema.json"
 ARQUIVO_LOG = "registro_ponto.txt"
 
@@ -22,10 +20,7 @@ def registrar_log(mensagem):
     except Exception as e:
         print("Erro ao salvar log:", e)  
         
-# =============================================
-# 2. COMPONENTES VISUAIS 
-# =============================================      
-
+# -- COMPONENTES VISUAIS --   
 class FuncionarioRow:
     def __init__(self, parent, nome, app):
         self.app = app
@@ -105,14 +100,11 @@ class FuncionarioRow:
         self.app.salvar_dados()
         self.app.atualizar_log_tela()
         
-#=============================
-# APLICAÇÃO PRINCIPAL (Layout)                                    
-#=============================
+# -- APLICAÇÃO PRINCIPAL (Layout). --                                    
 class AppPonto:
     def __init__(self, root):
-        #==================================
-        # CONFIGURAÇÃO RAIZ E INICIALIZAÇÃO
-        #==================================
+
+        # -- CONFIGURAÇÃO RAIZ E INICIALIZAÇÃO. --
         self.root = root
         self.root.title("Controle de Presença Corporativo - Open Source")
         self.root.geometry("1050x700")
@@ -143,9 +135,9 @@ class AppPonto:
                 pass
     
     def _configurar_layout(self):
-        #================================================
+   
+   
         # LADO ESQUERDO (Lista com Scrollbar) E TÍTULOS.
-        #================================================ 
         """MOnta todas as divisões da tela principal."""
         tk.Label(self.root, text="Controle de Entrada e Saída", font=("Arial", 16, "bold")).pack(pady=10)
         tk.Label(self.root, text="© 2026 Gabriel Max • Licença MIT (GitHub: devgmax)", font=("Arial", 9, "Italic"), fg="gray").pack(side="bottom", pady=5)
@@ -173,9 +165,8 @@ class AppPonto:
                 row = FuncionarioRow(self.frame_funcionarios, nome, self)
                 self.funcionarios_rows.append(row)
         
-        #==============================
-        # LADO DIREITO E CAIXAS DE LOGS
-        #==============================
+        # -- LADO DIREITO E CAIXAS DE LOGS --
+        
         frame_lateral = tk.Frame(self.root, bd=2, relief="groove", padx=10, pady=10)
         frame_lateral.pack(side="right", fill="y", padx=15, pady=5)
          
@@ -201,9 +192,7 @@ class AppPonto:
         self.caixa_log.pack(side="left", fill="both", expand=True)
         scroll_log.pack(side="right", fill="y")
         
-    # = LOGICA DO CALENDÁRIO E BUSCA =
-    
-    # -- MOTORES DO CALENDÁRIO E DE BUSCA AVANÇADA --
+    # -- LOGICA DO CALENDÁRIO E BUSCA / MOTORES DO CALENDÁRIO E DE BUSCA AVANÇADA --
     def desenhar_calendario(self):
         for widget in self.frame_calendario.winfo_children(): widget.destroy()
 
@@ -310,4 +299,8 @@ class AppPonto:
         caixa.config(state="disabled")    
            
         
-                         
+# -- BLOCO DE EXECUÇÃO --
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = AppPonto(root)
+    root.mainloop()                         
