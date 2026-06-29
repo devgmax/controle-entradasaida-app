@@ -118,20 +118,35 @@ class AppPonto:
         self.atualizar_log_tela()
     
     def preparar_ambiente_ficticio(self):
-        """"Cria o JSON base se o app for aberto pela primeira vez."""
+        """"Cria o JSON base se o app for aberto pela primeira vez ou se o arquivo estiver vazio/corrompido."""
+        precisa_criar = False
+        
+        # Passo 1: Verificação física de existência
         if not os.path.exists(ARQUIVO_MEMORIA):
-           equipe = [
-               "Gerente de Projetos", "Tech Lead", "Dev Senior", "Dev Pleno", 
-               "Dev Backend", "Dev Frontend", "Dev Full Stack", "QA Analyst",
-               "UX Designer", "Estagiário 01", "Estagiário 02", "Analista de Suporte"
-           ]
-           dados_padrao = {nome: {"is_in": False, "status": "Ativo"} for nome in equipe}
-           dados_padrao["DATA_SISTEMA"] = datetime.now().strftime("%Y-%m-%d")
+            precisa_criar = True
+        else:
+            # Passo 2: Teste de integridade do conteúdo (Evita o JSONDecodeError)
+            try:
+                with open(ARQUIVO_MEMORIA, "r", encoding="utf-8") as f:
+                    json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                # Se o arquivo estiver vazio (0 bytes) ou corrompido, ativa o sinal para recriar
+                precisa_criar = True
            
-        try:
-            with open(ARQUIVO_MEMORIA, "w", encoding="utf-8") as f:
-                   json.dump(dados_padrao, f, ensure_ascii=False, indent=4)
-        except Exception as e:
+        # Passo 3: Escrita do esquema padrão caso um dos testes acima falhe
+        if precisa_criar:
+            equipe = [
+                "Gerente de Projetos", "Tech Lead", "Dev Senior", "Dev Pleno", 
+                "Dev Backend", "Dev Frontend", "Dev Full Stack", "QA Analyst",
+                "UX Designer", "Estagiário 01", "Estagiário 02", "Analista de Suporte"
+            ]
+            dados_padrao = {nome: {"is_in": False, "status": "Ativo"} for nome in equipe}
+            dados_padrao["DATA_SISTEMA"] = datetime.now().strftime("%Y-%m-%d")
+            
+            try:
+                with open(ARQUIVO_MEMORIA, "w", encoding="utf-8") as f:
+                    json.dump(dados_padrao, f, ensure_ascii=False, indent=4)
+            except Exception as e:
                 pass
     
     def _configurar_layout(self):
