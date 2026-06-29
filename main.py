@@ -140,7 +140,7 @@ class AppPonto:
         # LADO ESQUERDO (Lista com Scrollbar) E TÍTULOS.
         """MOnta todas as divisões da tela principal."""
         tk.Label(self.root, text="Controle de Entrada e Saída", font=("Arial", 16, "bold")).pack(pady=10)
-        tk.Label(self.root, text="© 2026 Gabriel Max • Licença MIT (GitHub: devgmax)", font=("Arial", 9, "Italic"), fg="gray").pack(side="bottom", pady=5)
+        tk.Label(self.root, text="© 2026 Gabriel Max • Licença MIT (GitHub: devgmax)", font=("Arial", 9, "italic"), fg="gray").pack(side="bottom", pady=5)
         
         # -- Lado Esquerdo: Lista com Scroll
         container_esquerda = tk.Frame(self.root)
